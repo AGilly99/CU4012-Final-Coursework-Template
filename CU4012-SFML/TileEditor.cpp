@@ -19,7 +19,7 @@ TileEditor::TileEditor(sf::RenderWindow* hwnd, Input* in, GameState* game, sf::V
 
 	// Set up tile manager
 	tileManager->setCollectableTexture("gfx/Collectable.png");
-	tileManager->setPlatformTexture("gfx/Platform.png");
+	tileManager->setPlatformTexture("gfx/Tile (2).png");
 	tileManager->setWallTexture("gfx/Wall.png");
 	tileManager->setInput(input);
 	tileManager->setWindow(window);
@@ -68,7 +68,8 @@ void TileEditor::update(float dt)
 		"EDIT MODE\n"
 		"-Place: LMB\n-Move: Arrow Keys\n"
 		"-Scale: IJKL\n-Wall: B\n-Collectable: C\n"
-		"-Platform: P\n-Zoom: Q/E\n-Duplicate: Ctrl+D\n-Tab: Save and Exit\n"
+		"-Platform: P\n-Zoom: Q/E\n-Duplicate: Ctrl+D\n"
+		"-Save/Exit: E"
 	);
 	tileManager->handleInput(dt);
 	tileManager->update(dt);
