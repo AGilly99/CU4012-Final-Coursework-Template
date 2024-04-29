@@ -56,7 +56,6 @@ public:
 	void clearCollision() { collidingTag = ""; }
 	void UpdatePhysics(sf::Vector2f* gravity, float deltaTime);
 
-
 	//Collision Types 
 	void setTrigger(bool t) { isTrigger = t; }
 	bool getTrigger() { return isTrigger; }
@@ -68,6 +67,7 @@ public:
 	bool getStatic() { return isStatic; }
 
 	void setMassless(bool m) { isMassless = m; }
+	bool getMassless() { return isMassless; }
 	float getMass() const
 	{
 		return isStatic ? std::numeric_limits<float>::infinity() : mass;
@@ -81,6 +81,10 @@ public:
 	}
 	void setColor(sf::Color c) { collisionBoxDebug.setOutlineColor(c); }
 	void setTag(const std::string& t) { tag = t; }
+
+
+	void setTextureName(const std::string& name) { textureName = name; }
+	std::string getTextureName() const { return textureName; }
 
 protected:
 	// Collision functions
@@ -118,6 +122,7 @@ protected:
 			inverseMass = 1 / mass;
 		}
 	}
+
 
 	void setInertia(float i)
 	{
@@ -170,7 +175,8 @@ private:
 	sf::RectangleShape collisionBoxDebug;
 	bool Colliding;
 
-
+	//Textures
+	std::string textureName;
 
 	std::string tag;
 	std::string collidingTag;

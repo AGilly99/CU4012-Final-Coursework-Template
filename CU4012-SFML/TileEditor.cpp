@@ -1,4 +1,7 @@
 #include "TileEditor.h"
+#include "imgui.h"
+#include "imgui-SFML.h"
+#include "Framework/Utilities.h"
 
 TileEditor::TileEditor(sf::RenderWindow* hwnd, Input* in, GameState* game, sf::View* v, World* w, TileManager* tm)
 {
@@ -12,15 +15,13 @@ TileEditor::TileEditor(sf::RenderWindow* hwnd, Input* in, GameState* game, sf::V
 		std::cout << "error loading font" << std::endl;
 	};
 
-	TileEditorText.setFont(font);
-	TileEditorText.setCharacterSize(20);
-	TileEditorText.setOutlineThickness(0.5);
-	TileEditorText.setFillColor(sf::Color::Black);
+	if (!mouseCurosorTex.loadFromFile("gfx/cursor-grabbed.png"))
+	{
+		std::cout << "Error loading cursor texture\n";
+	}
+	mouseCurosorGrab.setTexture(mouseCurosorTex);
 
 	// Set up tile manager
-	tileManager->setCollectableTexture("gfx/Collectable.png");
-	tileManager->setPlatformTexture("gfx/Tile (2).png");
-	tileManager->setWallTexture("gfx/Wall.png");
 	tileManager->setInput(input);
 	tileManager->setWindow(window);
 	tileManager->setWorld(world);
@@ -36,9 +37,8 @@ TileEditor::TileEditor(sf::RenderWindow* hwnd, Input* in, GameState* game, sf::V
 		std::cout << "Tiles loaded\n";
 	}
 
-	hudView = window->getDefaultView();
-
 	originalViewSize = v->getSize(); // Store the original size of the view
+
 }
 
 TileEditor::~TileEditor()
@@ -57,80 +57,100 @@ void TileEditor::handleInput(float dt)
 		// Reset the view to the original size
 		view->setSize(originalViewSize);
 		view->setCenter(window->getSize().x / 2, window->getSize().y / 2);
+		view->zoom(1.0f);
 	}
 }
 
 void TileEditor::update(float dt)
 {
-	sf::Vector2f viewSize = sf::Vector2f(window->getSize().x, window->getSize().y);
-
-	TileEditorText.setString(
-		"EDIT MODE\n"
-		"-Place: LMB\n-Move: Arrow Keys\n"
-		"-Scale: IJKL\n-Wall: B\n-Collectable: C\n"
-		"-Platform: P\n-Zoom: Q/E\n-Duplicate: Ctrl+D\n"
-		"-Save/Exit: E"
-	);
 	tileManager->handleInput(dt);
 	tileManager->update(dt);
 	moveView(dt);
-
-	window->setView(hudView);
-	// Recalculate the viewSize considering the new zoom level
-	sf::Vector2f newViewSize = window->mapPixelToCoords(sf::Vector2i(window->getSize()), hudView) - window->mapPixelToCoords(sf::Vector2i(0, 0), hudView);
-	// Adjust the text position to be at the top left of the new viewSize
-	TileEditorText.setPosition(hudView.getCenter() - newViewSize * 0.5f);
 	window->setView(*view);
 }
 
 void TileEditor::render()
 {
-	beginDraw();
+	if(isDragging) window->draw(mouseCurosorGrab);
 	window->setView(*view);
 	tileManager->render(true);
 
-	//ALL the HUD should be drawn after this line
-	window->setView(hudView);
-	window->draw(TileEditorText);
-	endDraw();
-}
+	tileManager->DrawImGui();
 
-void TileEditor::beginDraw()
-{
-	window->clear(sf::Color(100, 149, 237));
-}
-
-void TileEditor::endDraw()
-{
-	window->display();
 }
 
 void TileEditor::moveView(float dt)
 {
-	float speed = 200.0f;
-	if (input->isKeyDown(sf::Keyboard::W))
+
+	sf::Vector2i pixelPos = sf::Vector2i(input->getMouseX(), input->getMouseY());
+	sf::Vector2f worldPos = window->mapPixelToCoords(pixelPos, *view);
+
+	// Set the sprite position to the mouse position in world coordinates
+	mouseCurosorGrab.setPosition(worldPos.x, worldPos.y);
+	mouseCurosorGrab.setScale(currentZoomLevel, currentZoomLevel);
+
+	// You can adjust the speed if needed
+	float dragSpeed = 200.0f; // The speed might need to be adjusted based on view scale
+
+	// Check for the left mouse button pressed event
+	if (input->isRightMouseDown())
 	{
-		view->move(0, -speed * dt);
+		window->setMouseCursorVisible(false);
+		if (!isDragging)
+		{
+			// When dragging starts, remember the initial position
+			isDragging = true;
+			lastMousePos.x = input->getMouseX();
+			lastMousePos.y = input->getMouseY();
+		}
+		else
+		{
+			// Calculate the difference between the current mouse position and the last mouse position
+			sf::Vector2i currentMousePos(input->getMouseX(), input->getMouseY());
+
+			// Use mapPixelToCoords to convert from window coordinates to world coordinates
+			sf::Vector2f lastWorldPos = window->mapPixelToCoords(lastMousePos);
+			sf::Vector2f currentWorldPos = window->mapPixelToCoords(currentMousePos);
+
+			// Calculate the delta in world coordinates
+			sf::Vector2f deltaPos = lastWorldPos - currentWorldPos;
+
+			// Move the view by this delta position
+			view->move(deltaPos);
+
+			// Update the last mouse position
+			lastMousePos = currentMousePos;
+
+			//input->setMousePosition(mousePos.x, mousePos.y);
+		}
 	}
-	if (input->isKeyDown(sf::Keyboard::S))
+	else
 	{
-		view->move(0, speed * dt);
+		// If the right mouse button is not pressed, we are not dragging
+		isDragging = false;
+		window->setMouseCursorVisible(true);
 	}
-	if (input->isKeyDown(sf::Keyboard::A))
-	{
-		view->move(-speed * dt, 0);
+
+	if (!tileManager->isInputTextActive()) {
+		if (input->isKeyDown(sf::Keyboard::Q))
+		{
+			currentZoomLevel *= 1.0005f;
+			view->zoom(1.0005f);
+		}
+		if (input->isKeyDown(sf::Keyboard::E))
+		{
+			currentZoomLevel *= 0.9995f;
+			view->zoom(0.9995f);
+		}
 	}
-	if (input->isKeyDown(sf::Keyboard::D))
-	{
-		view->move(speed * dt, 0);
+	// Handle mouse wheel zoom inputs
+	int wheelDelta = input->getMouseWheelDelta();
+	if (wheelDelta != 0) {
+		float zoomFactor = wheelDelta > 0 ? 0.9f : 1.1f;  // More significant zoom change per scroll
+		float zoomAdjustment = pow(zoomFactor, abs(wheelDelta));  // Apply the factor power of scroll intensity
+		currentZoomLevel *= zoomAdjustment;
+		view->zoom(zoomAdjustment);
 	}
-	if (input->isKeyDown(sf::Keyboard::Q))
-	{
-		view->zoom(1.0005f);
-	}
-	if (input->isKeyDown(sf::Keyboard::E))
-	{
-		view->zoom(0.9995f);
-	}
+	// Set the new view
 	window->setView(*view);
 }

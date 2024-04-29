@@ -18,9 +18,6 @@ public:
 	void update(float dt);
 	void render();
 	void moveView(float dt);
-	void beginDraw();
-	void endDraw();
-
 private:
 	// Default variables for level class.
 	sf::RenderWindow* window;
@@ -29,11 +26,17 @@ private:
 	GameState* gameState;
 	World* world;
 
-	sf::View hudView;
 	TileManager* tileManager;
-	sf::Text TileEditorText;
 	sf::Font font;
 	
 	sf::Vector2f originalViewSize;
+
+	//moving the view variables
+	float currentZoomLevel = 1.0f;
+	sf::Vector2i lastMousePos;
+	bool isDragging = false;
+	sf::Texture mouseCurosorTex;
+	sf::Sprite mouseCurosorGrab;
+
 };
 

@@ -1,5 +1,5 @@
 #include "Menu.h"
-
+#include "Framework/Utilities.h"
 Menu::Menu(sf::RenderWindow* hwnd, Input* in, GameState* game)
 {
 	window = hwnd;
@@ -13,7 +13,19 @@ Menu::Menu(sf::RenderWindow* hwnd, Input* in, GameState* game)
 
 	menu_texture.loadFromFile("gfx/menu.png");
 	menu_sprite.setTexture(menu_texture);
-	menu_sprite.setScale(0.5, 0.5);
+	
+	//Scaling the sprite to fit any screen 
+	auto bounds = menu_sprite.getLocalBounds();
+	float originalWidth = bounds.width;
+	float originalHeight = bounds.height;
+
+	float scaleX = SCREEN_WIDTH / originalWidth;
+	float scaleY = SCREEN_HEIGHT / originalHeight;
+
+	// To maintain aspect ratio, use the smaller of the two scales
+	float uniformScale = std::min(scaleX, scaleY);
+
+	menu_sprite.setScale(uniformScale, uniformScale);
 
 
 	Title.setFont(titleFont);
@@ -114,7 +126,7 @@ void Menu::MoveDown()
 	}
 
 }
-int Menu::handleInput(float dt)
+void Menu::handleInput(float dt)
 {
 	// Keyboard handling for menu navigation
 	if (input->isKeyDown(sf::Keyboard::Up)) {
@@ -149,13 +161,10 @@ int Menu::handleInput(float dt)
 		}
 	}
 
-	return 0; // Return value can be used if needed for further input handling logic
-
 }
 
 void Menu::render()
 {
-	beginDraw();
 	window->draw(menu_sprite);
 	window->draw(Title);
 	for (int i = 0; i < 2; i++)
@@ -169,17 +178,4 @@ void Menu::render()
 	//	window->draw(UIText[i].getDebugShape());
 	//}
 
-	endDraw();
-}
-
-
-
-
-void Menu::beginDraw()
-{
-	window->clear(sf::Color(0, 0, 0));
-}
-void Menu::endDraw()
-{
-	window->display();
 }
