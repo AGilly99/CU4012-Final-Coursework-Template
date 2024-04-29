@@ -50,7 +50,7 @@ void TileEditor::handleInput(float dt)
 	if (input->isKeyDown(sf::Keyboard::Tab))
 	{
 		input->setKeyUp(sf::Keyboard::Tab);
-		std::cout << "Exiting edit mode. Saving tiles...\n";
+		
 		tileManager->saveTiles(tileManager->getTiles(), tileManager->getFilePath());
 		gameState->setCurrentState(State::LEVEL);
 

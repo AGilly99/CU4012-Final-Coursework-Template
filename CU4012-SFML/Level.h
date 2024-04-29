@@ -25,4 +25,7 @@ private:
 	// Default variables for level class.
 	Zombie zomb;
 	Mario mario; 
+
+	sf::Texture backgroundTex;
+	sf::Sprite background;
 };

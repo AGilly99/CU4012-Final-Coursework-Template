@@ -6,7 +6,7 @@ Mario::Mario()
 
 	marioSpriteSheet.loadFromFile("gfx/MarioSheetT.png");
 	setSize(sf::Vector2f(15*4, 21*4));
-	setPosition(100, 100);
+	setPosition(-60, 500);
 	setTexture(&marioSpriteSheet);
 
 	Walk.addFrame(sf::IntRect(0, 0, 15, 21)); 

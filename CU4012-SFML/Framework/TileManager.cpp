@@ -122,6 +122,7 @@ void TileManager::handleInput(float dt)
                 duplicatedTile->setSize(tile->getSize());
                 duplicatedTile->setTag(tile->getTag());
                 duplicatedTile->setTexture(tile->getTexture()); // Ensure this method exists and works correctly
+                duplicatedTile->setTextureName(tile->getTextureName());
                 duplicatedTile->setTrigger(tile->getTrigger());
                 duplicatedTile->setStatic(tile->getStatic());
                 duplicatedTile->setMassless(tile->getMassless());
@@ -133,7 +134,7 @@ void TileManager::handleInput(float dt)
                 world->AddGameObject(*newTile);
                 int newIndex = tiles.size();
                 tiles.push_back(std::move(newTile));
-                selectedTileIndices.insert(newIndex); // Select new tiles
+                //selectedTileIndices.insert(newIndex); // Select new tiles
             }
 
             input->setKeyUp(sf::Keyboard::D); // Prevent continuous duplication while the key is held down
@@ -214,6 +215,7 @@ void TileManager::saveTiles(const std::vector<std::unique_ptr<Tiles>>& tiles, co
         return;
     }
 
+    std::cout << "Exiting edit mode. Saving tiles...\n";
     for (const auto& tile : tiles) {
         file << tile->getTag() << ","
             << tile->getPosition().x << ","
