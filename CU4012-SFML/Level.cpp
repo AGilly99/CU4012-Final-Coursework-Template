@@ -1,5 +1,6 @@
 #include "Level.h"
 #include "Framework/Utilities.h"
+
 Level::Level(sf::RenderWindow* hwnd, Input* in, GameState* gs,sf::View* v, World* w, TileManager* tm)
 {
 	window = hwnd;
@@ -37,10 +38,25 @@ Level::Level(sf::RenderWindow* hwnd, Input* in, GameState* gs,sf::View* v, World
 	mario.setInput(input);
 	mario.setAudio(audioManager);
 
-	audioManager->playMusicbyName("bgm");
+	//audioManager->playMusicbyName("bgm");
 
 	//world->AddGameObject(zomb);
 	world->AddGameObject(mario);
+
+	e1[0].setPosition(500, 636);
+	e1[1].setPosition(1000, 636);
+	e1[2].setPosition(1500, 636);
+	e1[3].setPosition(2000, 636);
+	e1[4].setPosition(2500, 636);
+	e1[5].setPosition(3000, 636);
+	e1[6].setPosition(4000, 636);
+	e1[7].setPosition(4600, 636);
+	e1[8].setPosition(7000, 636);
+	e1[9].setPosition(7100, 636);
+	for (int i = 0; i < NumberOfEnemies; i++)
+	{
+		world->AddGameObject(e1[i]);
+	}
 }
 
 Level::~Level()
@@ -85,20 +101,76 @@ void Level::update(float dt)
 	float newX = std::max(playerPosition.x, view->getSize().x / 2.0f);
 	view->setCenter(newX, view->getCenter().y);
 	window->setView(*view);
+
+	if (mario.getPosition().y > 800) 
+	{
+		mario.setPosition(56, 650);
+	}
+
+	//if (mario.CollisionWithTag("SPIKE"))
+	//{
+	//	mario.setPosition(56, 650);
+//	}
+
+	if (mario.CollisionWithTag("Collectable"))
+	{
+		// Player is Colliding with Collectable
+		mario.AddCollectable(); // Increment Collectable count
+		tileManager->RemoveCollectable(); // Remove the collectable
+
+		// Update the CollectablesCollectedText to display the new number of rings collected
+		int collectableCount = mario.getCollectableCount(); // Assume p1 is the player object and has the getCollectablesCount method
+		CollectablesCollectedText.setString("Collected: " + std::to_string(collectableCount));
+	}
+
+	for (int i = 0; i < NumberOfEnemies; i++)
+	{
+		if (e1[i].CollisionWithTag("Player"))
+		{
+			//std::cout << e1[i].getCollisionDirection() << std::endl;
+			if (e1[i].getCollisionDirection() == "Up")
+			{
+				e1[i].setAlive(false);
+				world->RemoveGameObject(e1[i]);
+			}
+			else
+			{
+				std::cout << "Player hit enemy from the side\n";
+				mario.setPosition(56, 650);
+			}
+		}
+		
+		for (size_t i = 0; i < NumberOfEnemies; i++)
+		{
+			if (e1[i].CollisionWithTag("Wall"))
+			{
+				e1[i].setVelocity(-e1[i].getVelocity().x, e1[i].getVelocity().y);
+			}
+		}
+	}
 }
 
 // Render level
 void Level::render()
 {
 	//window->draw(background);
-	window->draw(mario);
+	
 
 	if (gameState->getCurrentState() == State::LEVEL)
 	{
 		tileManager->render(false);
 	}
 
-	//window->draw(zomb);
+	window->draw(mario);
+
+	for (int i = 0; i < NumberOfEnemies; i++)
+	{
+		if (e1[i].isAlive())
+		{
+			window->draw(e1[i]);
+			//window->draw(e1[i].getDebugCollisionBox());
+		}
+	}
 }
 
 

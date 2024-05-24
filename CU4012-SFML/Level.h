@@ -11,6 +11,7 @@
 #include <iostream>
 #include "Zombie.h"
 #include "Mario.h"
+#include "Enemy.h"
 
 class Level : public BaseLevel{
 public:
@@ -21,11 +22,21 @@ public:
 	void update(float dt) override;
 	void render();
 	void adjustViewToWindowSize(unsigned int width, unsigned int height);
+
+	sf::Text CollectablesCollectedText;
+
 private:
+
+	int NumberOfEnemies = 10;
+	 Enemy e1[10];
+
 	// Default variables for level class.
 	Zombie zomb;
 	Mario mario; 
+	Enemy enemy;
 
 	sf::Texture backgroundTex;
 	sf::Sprite background;
+
+
 };
