@@ -23,9 +23,9 @@ Mario::Mario()
 	Duck.addFrame(sf::IntRect(0, 44, 17, 17));
 	//Duck.addFrame(sf::IntRect(17, 44, 17, 17));
 	Duck.setFrameSpeed(1.f / 2.f);
-
-	
 	currentAnimation = &Walk;
+
+	setTag("Player");
 }
 
 void Mario::handleInput(float dt)

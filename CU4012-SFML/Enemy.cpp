@@ -13,7 +13,7 @@ Enemy::Enemy()
 		std::cout << "File not found\n";
 	}
 	setTexture(&texture);
-	setSize(sf::Vector2f(30, 30));
+	setSize(sf::Vector2f(50, 50));
 	setCollisionBox(getPosition(), getSize());
 	setTag("Enemy");
 	setMass(50.f);

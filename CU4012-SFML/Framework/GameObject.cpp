@@ -137,51 +137,42 @@ bool GameObject::checkCollision(GameObject* otherBox)
             // Adjust positions to resolve collision
             if (intersectX > intersectY) {
                 if (deltaX > 0.0f) {
-                    move(intersectX * (1.0f - push), 0.f);
-                    otherBox->move(-intersectX * push, 0.0f);
 
                     //Collision on the right
-                    if (!otherBox->getStatic())
-                    {
-                        Direction.x = 1.f;
-                        Direction.y = 0.f;
-                    }
+                    Direction.x = 1.f;
+                    Direction.y = 0.f;
+
+                    move(intersectX * (1.0f - push), 0.f);
+                    otherBox->move(-intersectX * push, 0.0f);
                 }
                 else {
-                    move(-intersectX * (1.0f - push), 0.0f);
-                    otherBox->move(intersectX * push, 0.0f);
 
                     //Collision on the left
-                    if (!otherBox->getStatic())
-                    {
-                        Direction.x = -1.f;
-                        Direction.y = 0.f;
-                    }
+                    Direction.x = -1.f;
+                    Direction.y = 0.f;
+                    move(-intersectX * (1.0f - push), 0.0f);
+                    otherBox->move(intersectX * push, 0.0f);
                 }
             }
             else {
                 if (deltaY > 0.0f) {
+
+                    //Collision on the bottom
+                    Direction.x = 0.f;
+                    Direction.y = 1.f;
                     move(0.0f, intersectY * (1.f - push));
                     otherBox->move(0.0f, -intersectY * push);
 
-                    //Collision on the bottom
-                    if (!otherBox->getStatic())
-                    {
-                        Direction.x = 0.f;
-                        Direction.y = 1.f;
-                    }
                     canJump = true;
                 }
                 else {
-                    move(0.0f, -intersectY * (1.0f - push));
-                    otherBox->move(0.0f, intersectY * push);
 
                     //Collision on the top
-                    if (!otherBox->getStatic())
-                    {
-                        Direction.x = 0.f;
-                        Direction.y = -1.f;
-                    }
+                    Direction.x = 0.f;
+                    Direction.y = -1.f;
+
+                    move(0.0f, -intersectY * (1.0f - push));
+                    otherBox->move(0.0f, intersectY * push);
                 }
             }
 
@@ -214,51 +205,43 @@ bool GameObject::checkCollision(GameObject* otherBox)
             // Adjust positions to resolve collision
             if (intersectX > intersectY) {
                 if (deltaX > 0.0f) {
-                    move(intersectX * (1.0f - push), 0.f);
-                    otherBox->move(-intersectX * push, 0.0f);
 
                     //Collision on the right
-                    if (!otherBox->getStatic())
-                    {
-                        Direction.x = 1.f;
-                        Direction.y = 0.f;
-                    }
+                    Direction.x = 1.f;
+                    Direction.y = 0.f;
+
+                    move(intersectX * (1.0f - push), 0.f);
+                    otherBox->move(-intersectX * push, 0.0f);
                 }
                 else {
-                    move(-intersectX * (1.0f - push), 0.0f);
-                    otherBox->move(intersectX * push, 0.0f);
 
                     //Collision on the left
-                    if (!otherBox->getStatic())
-                    {
-                        Direction.x = -1.f;
-                        Direction.y = 0.f;
-                    }
+                    Direction.x = -1.f;
+                    Direction.y = 0.f;
+
+                    move(-intersectX * (1.0f - push), 0.0f);
+                    otherBox->move(intersectX * push, 0.0f);
                 }
             }
             else {
                 if (deltaY > 0.0f) {
+
+                    //Collision on the bottom
+                    Direction.x = 0.f;
+                    Direction.y = 1.f;
+
                     move(0.0f, intersectY * (1.f - push));
                     otherBox->move(0.0f, -intersectY * push);
 
-                    //Collision on the bottom
-                    if (!otherBox->getStatic())
-                    {
-                        Direction.x = 0.f;
-                        Direction.y = 1.f;
-                    }
                     canJump = true;
                 }
                 else {
+                    //Collision on the top
+                    Direction.x = 0.f;
+                    Direction.y = -1.f;
+
                     move(0.0f, -intersectY * (1.0f - push));
                     otherBox->move(0.0f, intersectY * push);
-
-                    //Collision on the top
-                    if (!otherBox->getStatic())
-                    {
-                        Direction.x = 0.f;
-                        Direction.y = -1.f;
-                    }
                 }
             }
             return true;
@@ -297,7 +280,7 @@ bool GameObject::checkCollision(GameObject* otherBox)
 void GameObject::collisionResponse(GameObject* collider)
 {
     // Check if collider is a tile and has a specific tag ("Wall" or "Collectable"), or if it is neither static nor a tile.
-    if ((collider->getTile() && (collider->getTag() == "Wall" || collider->getTag() == "Collectable")) ||
+    if ((collider->getTile() && (collider->getTag() == "Wall" ||collider->getTag() == "SPIKE DEATH" || collider->getTag() == "Collectable")) ||
         (!collider->getStatic() && !collider->getTile()))
     {
         // Update the colliding tag
@@ -357,5 +340,6 @@ void GameObject::UpdatePhysics(sf::Vector2f* gravity, float deltaTime)
         setRotation(getRotation() + angularVelocity * deltaTime);
         move(velocity * deltaTime);
         updateCollisionBox(deltaTime);
+    
     }
 }

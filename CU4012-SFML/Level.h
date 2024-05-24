@@ -27,8 +27,9 @@ public:
 
 private:
 
-	int NumberOfEnemies = 10;
-	 Enemy e1[10];
+	sf::Font font;
+	int NumberOfEnemies = 5;
+	 Enemy e1[5];
 
 	// Default variables for level class.
 	Zombie zomb;

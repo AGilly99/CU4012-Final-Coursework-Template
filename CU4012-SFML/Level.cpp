@@ -11,6 +11,9 @@ Level::Level(sf::RenderWindow* hwnd, Input* in, GameState* gs,sf::View* v, World
 	tileManager = tm;
 	audioManager = new AudioManager();
 
+	if (!font.loadFromFile("font/arial.ttf")) {
+		std::cout << "error loading font" << std::endl;
+	};
 
 	backgroundTex.loadFromFile("gfx/background.jpg");
 	background.setTexture(backgroundTex);
@@ -43,20 +46,23 @@ Level::Level(sf::RenderWindow* hwnd, Input* in, GameState* gs,sf::View* v, World
 	//world->AddGameObject(zomb);
 	world->AddGameObject(mario);
 
-	e1[0].setPosition(500, 636);
-	e1[1].setPosition(1000, 636);
-	e1[2].setPosition(1500, 636);
-	e1[3].setPosition(2000, 636);
-	e1[4].setPosition(2500, 636);
-	e1[5].setPosition(3000, 636);
-	e1[6].setPosition(4000, 636);
-	e1[7].setPosition(4600, 636);
-	e1[8].setPosition(7000, 636);
-	e1[9].setPosition(7100, 636);
+	e1[0].setPosition(500, 199);
+	e1[1].setPosition(600, -92);
+	e1[2].setPosition(1300, 700);
+	e1[3].setPosition(2400, 199);
+	e1[4].setPosition(3650, -240);
+
 	for (int i = 0; i < NumberOfEnemies; i++)
 	{
 		world->AddGameObject(e1[i]);
 	}
+
+	//Collectables Collected Text
+	CollectablesCollectedText.setFont(font);
+	CollectablesCollectedText.setCharacterSize(24);
+	CollectablesCollectedText.setFillColor(sf::Color::Green);
+	CollectablesCollectedText.setPosition(window->getSize().x, 0);
+	CollectablesCollectedText.setString("Collected: ");
 }
 
 Level::~Level()
@@ -94,6 +100,7 @@ void Level::handleInput(float dt)
 void Level::update(float dt)
 {
 
+
 	//Move the view to follow the player
 	view->setCenter(view->getCenter().x, 360);
 
@@ -101,6 +108,10 @@ void Level::update(float dt)
 	float newX = std::max(playerPosition.x, view->getSize().x / 2.0f);
 	view->setCenter(newX, view->getCenter().y);
 	window->setView(*view);
+
+	sf::Vector2f viewSize = sf::Vector2f(window->getSize().x, window->getSize().y);
+
+	CollectablesCollectedText.setPosition(view->getCenter().x - viewSize.x / 14, view->getCenter().y - viewSize.y / 2);
 
 	if (mario.getPosition().y > 800) 
 	{
@@ -127,16 +138,19 @@ void Level::update(float dt)
 	{
 		if (e1[i].CollisionWithTag("Player"))
 		{
-			//std::cout << e1[i].getCollisionDirection() << std::endl;
-			if (e1[i].getCollisionDirection() == "Up")
+			if (mario.CollisionWithTag("Enemy"))
 			{
-				e1[i].setAlive(false);
-				world->RemoveGameObject(e1[i]);
-			}
-			else
-			{
-				std::cout << "Player hit enemy from the side\n";
-				mario.setPosition(56, 650);
+				std::cout << mario.getCollisionDirection() << std::endl;
+				if (e1[i].getCollisionDirection() == "Down")
+				{
+					e1[i].setAlive(false);
+					world->RemoveGameObject(e1[i]);
+				}
+				else
+				{
+					std::cout << "Player hit enemy from the side\n";
+					mario.setPosition(56, 650);
+				}
 			}
 		}
 		
@@ -148,20 +162,23 @@ void Level::update(float dt)
 			}
 		}
 	}
+	if (mario.CollisionWithTag("SPIKE DEATH"))
+	{
+		std::cout << "Player hit SPIKE\n";
+		mario.setPosition(58, 650);
+	}
 }
 
 // Render level
 void Level::render()
 {
-	//window->draw(background);
-	
-
 	if (gameState->getCurrentState() == State::LEVEL)
 	{
 		tileManager->render(false);
 	}
 
 	window->draw(mario);
+
 
 	for (int i = 0; i < NumberOfEnemies; i++)
 	{
@@ -171,6 +188,8 @@ void Level::render()
 			//window->draw(e1[i].getDebugCollisionBox());
 		}
 	}
+
+	window->draw(CollectablesCollectedText);
 }
 
 
