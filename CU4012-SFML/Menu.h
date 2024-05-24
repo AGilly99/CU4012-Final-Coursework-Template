@@ -1,7 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "Framework/Input.h"
-#include "Framework/BaseLevel.h"
 #include "Framework/GameState.h"
 #include"Framework/Collision.h"
 #include "Framework/UI.h"
@@ -10,16 +9,16 @@
 #include"Level.h"
 
 
-class Menu : public BaseLevel
+class Menu
 {
 public:
 	Menu(sf::RenderWindow* hwnd, Input* in, GameState* game);
 	~Menu();
 
 
-	void handleInput(float dt) override;
-	void update(float dt) override;
-	void render() override;
+	int handleInput(float dt);
+	void update(float dt);
+	void render();
 	void MoveUp();
 	void MoveDown();
 	void updateVisualFeedback();
@@ -36,8 +35,9 @@ public:
 
 	sf::Text Title;
 	UI UIText[2];
-	
 
+	void beginDraw();
+	void endDraw();
 
 
 
@@ -48,4 +48,5 @@ public:
 
 	bool mouseOverAnyItem;
 };
+
 

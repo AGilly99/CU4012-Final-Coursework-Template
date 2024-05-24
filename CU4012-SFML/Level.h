@@ -40,4 +40,7 @@ private:
 	sf::Sprite background;
 
 
+	sf::View defaultView;
+
+
 };

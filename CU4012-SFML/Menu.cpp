@@ -1,5 +1,5 @@
 #include "Menu.h"
-#include "Framework/Utilities.h"
+
 Menu::Menu(sf::RenderWindow* hwnd, Input* in, GameState* game)
 {
 	window = hwnd;
@@ -13,33 +13,21 @@ Menu::Menu(sf::RenderWindow* hwnd, Input* in, GameState* game)
 
 	menu_texture.loadFromFile("gfx/menu.png");
 	menu_sprite.setTexture(menu_texture);
-	
-	//Scaling the sprite to fit any screen 
-	auto bounds = menu_sprite.getLocalBounds();
-	float originalWidth = bounds.width;
-	float originalHeight = bounds.height;
-
-	float scaleX = SCREEN_WIDTH / originalWidth;
-	float scaleY = SCREEN_HEIGHT / originalHeight;
-
-	// To maintain aspect ratio, use the smaller of the two scales
-	float uniformScale = std::min(scaleX, scaleY);
-
-	menu_sprite.setScale(uniformScale, uniformScale);
+	menu_sprite.setScale(0.5, 0.5);
 
 
 	Title.setFont(titleFont);
-	Title.setFillColor(sf::Color::Magenta);
-	Title.setString("My Game");
+	Title.setFillColor(sf::Color::Yellow);
+	Title.setString("Aidans Super Mario Game in SPACE");
 	Title.setOutlineColor(sf::Color::Black);
-	Title.setCharacterSize(70);
-	Title.setPosition(500, 50);
+	Title.setCharacterSize(60);
+	Title.setPosition(350, 50);
 
 
 	UIText[0].text.setFont(UIfont);
 	UIText[0].text.setFillColor(sf::Color::Red);
 	UIText[0].text.setString("Play");
-	UIText[0].text.setPosition(sf::Vector2f(600,120));
+	UIText[0].text.setPosition(sf::Vector2f(600, 120));
 	UIText[0].setCollisionBox(sf::FloatRect(600, 135, 35, 15));
 
 
@@ -47,7 +35,7 @@ Menu::Menu(sf::RenderWindow* hwnd, Input* in, GameState* game)
 	UIText[1].text.setFont(UIfont);
 	UIText[1].text.setFillColor(sf::Color::White);
 	UIText[1].text.setString("Exit");
-	UIText[1].text.setPosition(sf::Vector2f(600,150));
+	UIText[1].text.setPosition(sf::Vector2f(600, 150));
 	UIText[1].setCollisionBox(sf::FloatRect(600, 165, 35, 15));
 
 
@@ -64,21 +52,6 @@ Menu::~Menu()
 void Menu::update(float dt)
 {
 	mouseOverAnyItem = false; // Reset this flag each frame
-	
-
-	// Update the position of the text
-	sf::Vector2u windowSize = window->getSize();
-
-
-	Title.setPosition(windowSize.x / 2 - Title.getGlobalBounds().width / 2, 50);
-
-
-	UIText[0].text.setPosition(sf::Vector2f(windowSize.x / 2 - UIText[0].text.getGlobalBounds().width / 2, 120));
-	UIText[0].setCollisionBox(sf::FloatRect(windowSize.x / 2 - UIText[0].text.getGlobalBounds().width / 2, 135, 35, 15));
-
-	UIText[1].text.setPosition(windowSize.x / 2 - UIText[1].text.getGlobalBounds().width / 2, 150);
-	UIText[1].setCollisionBox(sf::FloatRect(windowSize.x / 2 - UIText[1].text.getGlobalBounds().width / 2, 165, 35, 15));
-
 
 	// Update mouse position
 	MousePos.x = input->getMouseX();
@@ -98,13 +71,14 @@ void Menu::update(float dt)
 
 void Menu::updateVisualFeedback()
 {
-    for (int i = 0; i < 2; i++) {
-        if (i == selectedItem) {
+	for (int i = 0; i < 2; i++) {
+		if (i == selectedItem) {
 			UIText[i].text.setFillColor(sf::Color::Red); // Highlight selected item
-        } else {
-            UIText[i].text.setFillColor(sf::Color::White); // Default color for non-selected items
-        }
-    }
+		}
+		else {
+			UIText[i].text.setFillColor(sf::Color::White); // Default color for non-selected items
+		}
+	}
 }
 
 void Menu::MoveUp()
@@ -126,7 +100,7 @@ void Menu::MoveDown()
 	}
 
 }
-void Menu::handleInput(float dt)
+int Menu::handleInput(float dt)
 {
 	// Keyboard handling for menu navigation
 	if (input->isKeyDown(sf::Keyboard::Up)) {
@@ -161,11 +135,13 @@ void Menu::handleInput(float dt)
 		}
 	}
 
+	return 0; // Return value can be used if needed for further input handling logic
+
 }
 
 void Menu::render()
 {
-	window->draw(menu_sprite);
+	//window->draw(menu_sprite);
 	window->draw(Title);
 	for (int i = 0; i < 2; i++)
 	{
@@ -179,3 +155,7 @@ void Menu::render()
 	//}
 
 }
+
+
+
+

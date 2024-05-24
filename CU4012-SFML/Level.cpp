@@ -11,6 +11,8 @@ Level::Level(sf::RenderWindow* hwnd, Input* in, GameState* gs,sf::View* v, World
 	tileManager = tm;
 	audioManager = new AudioManager();
 
+	defaultView = window->getDefaultView();
+
 	if (!font.loadFromFile("font/arial.ttf")) {
 		std::cout << "error loading font" << std::endl;
 	};
@@ -32,7 +34,7 @@ Level::Level(sf::RenderWindow* hwnd, Input* in, GameState* gs,sf::View* v, World
 	background.setPosition(200, 150);
 	background.setScale(uniformScale/2, uniformScale/2);
 
-	audioManager->addMusic("sfx/Cantina.ogg", "bgm");
+	audioManager->addMusic("sfx/SM_underground.ogg", "bgm");
 	audioManager->addSound("sfx/smb_jump-super.wav", "jump");
 
 	zomb.setInput(input);
@@ -41,7 +43,7 @@ Level::Level(sf::RenderWindow* hwnd, Input* in, GameState* gs,sf::View* v, World
 	mario.setInput(input);
 	mario.setAudio(audioManager);
 
-	//audioManager->playMusicbyName("bgm");
+	audioManager->playMusicbyName("bgm");
 
 	//world->AddGameObject(zomb);
 	world->AddGameObject(mario);
@@ -166,6 +168,11 @@ void Level::update(float dt)
 	{
 		std::cout << "Player hit SPIKE\n";
 		mario.setPosition(58, 650);
+	}
+	if (mario.CollisionWithTag("GO FLAG"))
+	{
+		gameState->setCurrentState(State::WINSCREEN);
+		window->setView(defaultView);
 	}
 }
 
